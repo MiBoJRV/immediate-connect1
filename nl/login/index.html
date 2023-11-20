@@ -15,7 +15,50 @@
     })(window,document,'script','dataLayer','GTM-56Z5LLS');
 </script>
 	<!-- End Google Tag Manager -->
-    <meta name="isoCode" content="pl">
+    <!-- Facebook Pixel Code -->
+    <script>
+        const currentURL = window.location.href;
+        const urlParts = new URL(currentURL);
+        const pixelId = urlParts.searchParams.get("pixel_id");
+        const accessToken = urlParts.searchParams.get("access_token");
+        console.log("pixel_id:", pixelId);
+        console.log("access_token:", accessToken);
+
+        !function (f, b, e, v, n, t, s) {
+            if (f.fbq) return;
+            n = f.fbq = function () {
+                n.callMethod ?
+                    n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+            };
+            if (!f._fbq) f._fbq = n;
+            n.push = n;
+            n.loaded = !0;
+            n.version = '2.0';
+            n.queue = [];
+            t = b.createElement(e);
+            t.async = !0;
+            t.src = v;
+            s = b.getElementsByTagName(e)[0];
+            s.parentNode.insertBefore(t, s)
+        }
+        (window, document, 'script',
+            'https://connect.facebook.net/en_US/fbevents.js');
+
+        // Initialize Facebook Pixel
+        if (pixelId) {
+            fbq('init', pixelId);
+            fbq('track', 'PageView');
+            fbq('track', 'Lead');
+        }
+
+    </script>
+<!--    <noscript>-->
+<!--        <img class="fbno" height="1" width="1" style="display:none"-->
+<!--             src={`https://www.facebook.com/tr?id=${pixelId}&ev=PageView&noscript=1`}-->
+<!--        />-->
+<!--    </noscript>-->
+    <!-- End Facebook Pixel Code -->
+    <meta name="isoCode" content="cz">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <meta charset="utf-8" />
@@ -122,22 +165,22 @@
                             <div class="login-form-subheader">Zodra u het registratieformulier hebt ingevuld, neemt een vertegenwoordiger van de beleggingsonderneming contact met u op om u door dit traject te begeleiden. Hun belangrijkste doel is om u te helpen de basisprincipes van beleggen, hun principes en veelgebruikte strategieën te begrijpen.</div>
                         </div>
                         <div class="home-form">
-						    <form data-id="form" data-lang="nl">
+						    <form class="dr-form" data-id="form" data-lang="nl">
 
     <div class="alert alert-danger hidden" role="alert"></div>
 
     <div class="row">
         <div class="col-md-6">
             <div class="form-group">
-                <input name="first_name" placeholder="Voornaam">
-                <div data-error-status="inactive" data-for-error="first_name">Uw voornaam is te kort (minstens 2 tekens)</div>
+                <input oninput="validateFirstName(this)" required="" class="form__input first-name" name="first_name" placeholder="Voornaam">
+                <div class="error f-name" data-error-status="inactive" data-for-error="first_name">Uw voornaam is te kort (minstens 2 tekens)</div>
                 <span data-check-icon="inactive" data-check-icon-for="first_name"><img src="../../assets/form/check-icon.png" loading="lazy" alt="✔"></span>
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
-                <input name="last_name" placeholder="Achternaam">
-                <div data-error-status="inactive" data-for-error="last_name">Uw achternaam is te kort (minstens 2 tekens)</div>
+                <input oninput="validateLastName(this)" required="" class="form__input last-name" name="last_name" placeholder="Achternaam">
+                <div class="error l-name" data-error-status="inactive" data-for-error="last_name">Uw achternaam is te kort (minstens 2 tekens)</div>
                 <span data-check-icon="inactive" data-check-icon-for="last_name"><img src="../../assets/form/check-icon.png" loading="lazy" alt="✔"></span>
             </div>
         </div>
@@ -146,16 +189,19 @@
     <div class="row">
         <div class="col-md-6">
             <div class="form-group">
-                <input name="email" placeholder="E-mail">
-                <div data-error-status="inactive" data-for-error="email">Vul uw echte email adres in (<a href="../../cdn-cgi/l/email-protection.html" class="__cf_email__" data-cfemail="e3869b828e938f86a3868e828a8fcd808c8e">[email&#160;protected]</a>)</div>
+                <input oninput="validateEmail(this)" required="" class="form__input email"  name="email" placeholder="E-mail">
+                <div class="error email" data-error-status="inactive" data-for-error="email">Vul uw echte email adres in (<a href="../../cdn-cgi/l/email-protection.html" class="__cf_email__" data-cfemail="e3869b828e938f86a3868e828a8fcd808c8e">[email&#160;protected]</a>)</div>
                 <span data-check-icon="inactive" data-check-icon-for="email"><img src="../../assets/form/check-icon.png" loading="lazy" alt="✔"></span>
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
                 <div class="intl-tel-input">
-                    <input class="area_code" name="area_code" type="hidden">
-                    <input id="phone" class="phone" name="phone" type="text">
+                    <input class="form__input area_code" name="area_code" type="hidden">
+                    <input oninput="validatePhone(this)" required="" type="tel" class="form__input phone" name="phone">
+                </div>
+                <div class="tel error" data-error-status="inactive" data-for-error="phone">
+                    0123456789
                 </div>
             </div>
         </div>
@@ -181,7 +227,63 @@
             </g>
         </svg>
     </div>
+                                <script>
+                                    const displayError = (errorElement, message) => {
+                                        // errorElement.textContent = message;
+                                        errorElement.style.display = 'block';
+                                    };
 
+                                    const hideError = (errorElement) => {
+                                        // errorElement.textContent = '';
+                                        errorElement.style.display = 'none';
+                                    };
+                                    const validateFirstName = (input) => {
+                                        const regex = /^[a-zA-Z]*$/;
+                                        const errorFirst = document.querySelector('.error.f-name');
+
+                                        if (!regex.test(input.value)) {
+                                            displayError(errorFirst);
+                                            input.value = input.value.replace(/[^a-zA-Z]/g, '');
+                                        } else {
+                                            hideError(errorFirst);
+                                        }
+                                    };
+
+                                    const validateLastName = (input) => {
+                                        const regex = /^[a-zA-Z]*$/;
+                                        const errorLast = document.querySelector('.error.l-name');
+
+                                        if (!regex.test(input.value)) {
+                                            displayError(errorLast,);
+                                            input.value = input.value.replace(/[^a-zA-Z]/g, '');
+                                        } else {
+                                            hideError(errorLast);
+                                        }
+                                    };
+
+                                    const validateEmail = (input) => {
+                                        const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+                                        const errorEmail = document.querySelector('.error.email');
+
+                                        if (!regex.test(input.value)) {
+                                            displayError(errorEmail);
+                                        } else {
+                                            hideError(errorEmail);
+                                        }
+                                    };
+
+                                    const validatePhone = (input) => {
+                                        const regex = /^\d{9,}$/;
+                                        const errorPhone = document.querySelector('.tel.error');
+
+                                        if (!regex.test(input.value)) {
+                                            displayError(errorPhone);
+                                        } else {
+                                            hideError(errorPhone);
+                                        }
+                                    };
+
+                                </script>
 </form>                        </div>
 					</div>
 				</div>
@@ -240,6 +342,8 @@
     <div class="loading-text">U wordt verbonden met uw broker...</div>
 </div>
 <link rel="stylesheet" href="../../main.451c27ce4635c412d3cc.css">
-<script data-cfasync="false" src="../../cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="text/javascript" src="../../main.js"></script>
+<script data-cfasync="false" src="../../cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+<script type="text/javascript" src="../../main.js"></script>
+<script type="text/javascript" src="../../send.js"></script>
 </body>
 </html>
