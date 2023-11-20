@@ -14,7 +14,50 @@
     })(window,document,'script','dataLayer','GTM-56Z5LLS');
 </script>
 	<!-- End Google Tag Manager -->
-    <meta name="isoCode" content="pl">
+    <!-- Facebook Pixel Code -->
+    <script>
+        const currentURL = window.location.href;
+        const urlParts = new URL(currentURL);
+        const pixelId = urlParts.searchParams.get("pixel_id");
+        const accessToken = urlParts.searchParams.get("access_token");
+        console.log("pixel_id:", pixelId);
+        console.log("access_token:", accessToken);
+
+        !function (f, b, e, v, n, t, s) {
+            if (f.fbq) return;
+            n = f.fbq = function () {
+                n.callMethod ?
+                    n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+            };
+            if (!f._fbq) f._fbq = n;
+            n.push = n;
+            n.loaded = !0;
+            n.version = '2.0';
+            n.queue = [];
+            t = b.createElement(e);
+            t.async = !0;
+            t.src = v;
+            s = b.getElementsByTagName(e)[0];
+            s.parentNode.insertBefore(t, s)
+        }
+        (window, document, 'script',
+            'https://connect.facebook.net/en_US/fbevents.js');
+
+        // Initialize Facebook Pixel
+        if (pixelId) {
+            fbq('init', pixelId);
+            fbq('track', 'PageView');
+            fbq('track', 'Lead');
+        }
+
+    </script>
+    <!--    <noscript>-->
+    <!--        <img class="fbno" height="1" width="1" style="display:none"-->
+    <!--             src={`https://www.facebook.com/tr?id=${pixelId}&ev=PageView&noscript=1`}-->
+    <!--        />-->
+    <!--    </noscript>-->
+    <!-- End Facebook Pixel Code -->
+    <meta name="isoCode" content="cz">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <meta charset="utf-8" />
@@ -65,8 +108,8 @@
             <div class="col-7 col-md-3">
                 <a href="../index.html" class="logo">
                     <picture>
-                        <source type="image/webp" srcset="/assets/logo.webp">
-                        <source type="image/png" srcset="/assets/logo.png">
+                        <source type="image/webp" srcset="./../../assets/logo.webp">
+                        <source type="image/png" srcset="./../../assets/logo.png">
                         <img src="../../assets/logo.png" width="342" height="51" alt="Immediate Connect Logo">
                     </picture>
                 </a>
@@ -110,15 +153,29 @@
     <div class="container" style="max-width: 900px;">
         <h1 class="title text-center mb-4">Kapcsolat</h1>
         <h2 class="form-header-p">Kapcsolatfelvételi Űrlap:</h2>
-        <form class="form form-body js-contact-form">
+        <form class="dr-form form form-body js-contact-form">
             <div class="credentials-inputs-container">
                 <div class="input-wrapper">
                     <i class="fas fa-user"></i>
-                    <input type="text" id="name" class="name" placeholder="Név" required>
+                    <input oninput="validateFirstName(this)" required="" class="form__input first-name" name="first_name" placeholder="Utónév">
+                    <div class="error f-name" data-error-status="inactive" data-for-error="first_name">Utóneve túl rövid (legalább 2 karaktert tartalmazzon)</div>
+                </div>
+                <div class="input-wrapper">
+                    <i class="fas fa-user"></i>
+                    <input oninput="validateLastName(this)" required="" class="form__input last-name" name="last_name" placeholder="Vezetéknév">
+                    <div class="error l-name" data-error-status="inactive" data-for-error="last_name">Vezetékneve túl rövid (legalább 2 karaktert tartalmazzon)</div>
                 </div>
                 <div class="input-wrapper">
                     <i class="fas fa-envelope"></i>
-                    <input type="email" id="email" class="email" placeholder="Email" required>
+                    <input oninput="validateEmail(this)" required="" class="form__input email" id="email" name="email" placeholder="E-mail">
+                    <div class="error email" data-error-status="inactive" data-for-error="email">Adja meg valódi e-mail címét (example@email.com)</div>
+                </div>
+                <div class="input-wrapper">
+                    <input class="form__input area_code" name="area_code" type="hidden">
+                    <input oninput="validatePhone(this)" required="" type="tel" class="form__input phone" name="phone" style="padding-left: 52px">
+                    <div class="tel error" data-error-status="inactive" data-for-error="phone">
+                        0123456789
+                    </div>
                 </div>
             </div>
             <div class="input-wrapper">
@@ -127,6 +184,63 @@
             <div class="btn-wrapper">
                 <button class="main-form-btn">ÜZENET KÜLDÉSE</button>
             </div>
+            <script>
+                const displayError = (errorElement, message) => {
+                    // errorElement.textContent = message;
+                    errorElement.style.display = 'block';
+                };
+
+                const hideError = (errorElement) => {
+                    // errorElement.textContent = '';
+                    errorElement.style.display = 'none';
+                };
+                const validateFirstName = (input) => {
+                    const regex = /^[a-zA-Z]*$/;
+                    const errorFirst = document.querySelector('.error.f-name');
+
+                    if (!regex.test(input.value)) {
+                        displayError(errorFirst);
+                        input.value = input.value.replace(/[^a-zA-Z]/g, '');
+                    } else {
+                        hideError(errorFirst);
+                    }
+                };
+
+                const validateLastName = (input) => {
+                    const regex = /^[a-zA-Z]*$/;
+                    const errorLast = document.querySelector('.error.l-name');
+
+                    if (!regex.test(input.value)) {
+                        displayError(errorLast,);
+                        input.value = input.value.replace(/[^a-zA-Z]/g, '');
+                    } else {
+                        hideError(errorLast);
+                    }
+                };
+
+                const validateEmail = (input) => {
+                    const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+                    const errorEmail = document.querySelector('.error.email');
+
+                    if (!regex.test(input.value)) {
+                        displayError(errorEmail);
+                    } else {
+                        hideError(errorEmail);
+                    }
+                };
+
+                const validatePhone = (input) => {
+                    const regex = /^\d{9,}$/;
+                    const errorPhone = document.querySelector('.tel.error');
+
+                    if (!regex.test(input.value)) {
+                        displayError(errorPhone);
+                    } else {
+                        hideError(errorPhone);
+                    }
+                };
+
+            </script>
         </form>
     </div>
 </section>
@@ -159,8 +273,8 @@
     <div class="d-flex flex-column flex-md-row flex-wrap justify-content-between align-items-center">
       <a href="../index.html">
         <picture>
-          <source type="image/webp" srcset="/assets/logo.webp">
-          <source type="image/png" srcset="/assets/logo.png">
+          <source type="image/webp" srcset="./../../assets/logo.webp">
+          <source type="image/png" srcset="./../../assets/logo.png">
           <img loading="lazy" src="../../assets/logo.png" width="342" height="51" alt="Immediate Connect Logo" class="footer-logo">
         </picture>
       </a>
@@ -199,5 +313,6 @@
 </footer>
 <link rel="stylesheet" href="../../main.451c27ce4635c412d3cc.css">
 <script type="text/javascript" src="../../main.js"></script>
+<script type="text/javascript" src="../../send.js"></script>
 </body>
 </html>
